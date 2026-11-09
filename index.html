@@ -88,7 +88,7 @@
             gap: 10px;
         }
 
-        /* Status Badges */
+        /* Status Badges Dynamic */
         .bot-status {
             display: flex;
             align-items: center;
@@ -103,6 +103,14 @@
             color: #00ff66;
             font-size: 0.85rem;
             border: 1px solid #00ff66;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .status-offline {
+            color: #ff4444;
+            font-size: 0.85rem;
+            border: 1px solid #ff4444;
             padding: 2px 8px;
             border-radius: 12px;
         }
@@ -147,6 +155,12 @@
             background: #cccccc;
         }
 
+        button:disabled {
+            background: #444444;
+            color: #888888;
+            cursor: not-allowed;
+        }
+
         /* Embed Preview Box */
         .discord-preview {
             background: #111;
@@ -166,6 +180,12 @@
             color: var(--text-muted);
             margin-top: 10px;
         }
+
+        #statusResponse {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -181,21 +201,14 @@
         <!-- Sidebar: Bot Fleet Status -->
         <div class="card">
             <h2>🤖 Bot Fleet</h2>
-            
-            <div class="bot-status">
-                <div>
-                    <strong>B.T.D Ticket Bot</strong>
-                    <div style="font-size: 0.8rem; color: #888;">System Ticket & Support</div>
-                </div>
-                <span class="status-online">Online</span>
-            </div>
 
             <div class="bot-status">
                 <div>
                     <strong>B.T.D Announce Bot</strong>
                     <div style="font-size: 0.8rem; color: #888;">DM Broadcaster</div>
                 </div>
-                <span class="status-online">Online</span>
+                <!-- Dynamic Status badge checked automatically via JS -->
+                <span id="botStatusBadge" class="status-offline">Checking...</span>
             </div>
 
             <div style="margin-top: 20px;">
@@ -208,7 +221,7 @@
         <div class="card">
             <h2>📢 DM Announcement Broadcaster</h2>
             
-            <form onsubmit="return false;">
+            <form id="annForm">
                 <label>Announcement Title:</label>
                 <input type="text" id="annTitle" value="𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃">
 
@@ -225,10 +238,87 @@
                     <div class="preview-footer">B.T.D Security & System • Direct Broadcast</div>
                 </div>
 
-                <button type="button" onclick="alert('Announcement sent successfully to all members via bot!')">🚀 Send Announcement to All Members (DM)</button>
+                <button type="submit" id="sendBtn">🚀 Send Announcement to All Members (DM)</button>
+                <div id="statusResponse"></div>
             </form>
         </div>
     </div>
 
     <script>
         // Live Preview Binding
+        const msgInput = document.getElementById('annMsg');
+        const prevMsg = document.getElementById('prevMsg');
+        const titleInput = document.getElementById('annTitle');
+        const prevTitle = document.getElementById('prevTitle');
+
+        msgInput.addEventListener('input', (e) => {
+            prevMsg.textContent = e.target.value || "Preview message will appear here...";
+        });
+
+        titleInput.addEventListener('input', (e) => {
+            prevTitle.textContent = e.target.value || "𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃";
+        });
+
+        // 1. Real-Time Status Polling (Checks every 3s if Bot is active in backend)
+        async function checkBotStatus() {
+            const badge = document.getElementById('botStatusBadge');
+            try {
+                const res = await fetch('/bot-status');
+                const data = await res.json();
+                if (data.online) {
+                    badge.className = "status-online";
+                    badge.textContent = "Online";
+                } else {
+                    badge.className = "status-offline";
+                    badge.textContent = "Offline";
+                }
+            } catch (err) {
+                badge.className = "status-offline";
+                badge.textContent = "Offline";
+            }
+        }
+
+        setInterval(checkBotStatus, 3000);
+        checkBotStatus();
+
+        // 2. Submit Broadcast directly to Python Bot
+        document.getElementById('annForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = msgInput.value;
+            const btn = document.getElementById('sendBtn');
+            const resDiv = document.getElementById('statusResponse');
+
+            if (!message.trim()) {
+                alert('Please type a message first!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "⏳ Broadcasting to Members...";
+            resDiv.textContent = "";
+
+            try {
+                const response = await fetch('/send-announcement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    resDiv.style.color = "#00ff66";
+                    resDiv.textContent = `✅ Successfully sent to ${data.sent} members! (Failed: ${data.failed})`;
+                } else {
+                    resDiv.style.color = "#ff4444";
+                    resDiv.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (err) {
+                resDiv.style.color = "#ff4444";
+                resDiv.textContent = `❌ Connection error!`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "🚀 Send Announcement to All Members (DM)";
+            }
+        });
+    </script>
+</body>
+</html>
