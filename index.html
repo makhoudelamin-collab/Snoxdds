@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝚂𝚈𝚂𝚃𝙴𝙼</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #0d0d0d;
+            --border-color: #ffffff;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --accent-glow: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-banner {
+            background: #000;
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 18s linear infinite;
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media(max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(255,255,255,0.05);
+        }
+
+        h2 {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #222;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .status-online {
+            color: #00ff66;
+            font-size: 0.85rem;
+            border: 1px solid #00ff66;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .status-offline {
+            color: #ff4444;
+            font-size: 0.85rem;
+            border: 1px solid #ff4444;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #fff;
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #fff;
+            color: #000;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        button:hover { background: #cccccc; }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+        .discord-preview {
+            background: #111;
+            border-left: 4px solid #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .preview-title { font-weight: bold; margin-bottom: 5px; }
+        .preview-footer { font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; }
+        #statusResponse { margin-top: 10px; font-size: 0.9rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="hero-banner">
+        <div class="marquee-content">
+            𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝚂𝚈𝚂𝚃𝙴𝙼 • CONTROL CENTER • ANNOUNCEMENT & BOT MANAGEMENT
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>🤖 Bot Fleet</h2>
+            <div class="bot-status">
+                <div>
+                    <strong>B.T.D Announce Bot</strong>
+                    <div style="font-size: 0.8rem; color: #888;">DM Broadcaster</div>
+                </div>
+                <span id="botStatusBadge" class="status-offline">Checking...</span>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label>Active Bot Token:</label>
+                <input type="password" value="MTUzMDY1MTY3NjgyMDg5NzkzMg.GRfDEK..." readonly>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📢 DM Announcement Broadcaster</h2>
+            <form id="annForm">
+                <label>Announcement Title:</label>
+                <input type="text" id="annTitle" value="𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃">
+
+                <label>Message Content:</label>
+                <textarea id="annMsg" rows="4" placeholder="Type your announcement content here..."></textarea>
+
+                <label>Banner Image URL:</label>
+                <input type="text" id="annImg" value="https://i.postimg.cc/RZtGH1VG/Gemini-Generated-Image-admzaradmzaradmz.jpg">
+
+                <div class="discord-preview">
+                    <div class="preview-title" id="prevTitle">𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃</div>
+                    <div id="prevMsg" style="color: #ccc; font-size: 0.9rem;">Preview message will appear here...</div>
+                    <div class="preview-footer">B.T.D Security & System • Direct Broadcast</div>
+                </div>
+
+                <button type="submit" id="sendBtn">🚀 Send Announcement to All Members (DM)</button>
+                <div id="statusResponse"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const msgInput = document.getElementById('annMsg');
+        const prevMsg = document.getElementById('prevMsg');
+        const titleInput = document.getElementById('annTitle');
+        const prevTitle = document.getElementById('prevTitle');
+
+        msgInput.addEventListener('input', (e) => {
+            prevMsg.textContent = e.target.value || "Preview message will appear here...";
+        });
+
+        titleInput.addEventListener('input', (e) => {
+            prevTitle.textContent = e.target.value || "𝙱𝚁𝙾𝚃𝙷𝙴𝚁𝚂 𝚃𝙸𝙻𝙻 𝙳𝙴𝙰𝚃𝙷 - 𝙾𝙵𝙵𝙸𝙲𝙸𝙰𝐿 𝙰𝙽𝙽𝙾𝚄𝙽𝙲𝙴𝙼𝙴𝙽𝚃";
+        });
+
+        // Check real bot status from backend
+        async function checkBotStatus() {
+            const badge = document.getElementById('botStatusBadge');
+            try {
+                const res = await fetch('/bot-status');
+                const data = await res.json();
+                if (data.online) {
+                    badge.className = "status-online";
+                    badge.textContent = "Online";
+                } else {
+                    badge.className = "status-offline";
+                    badge.textContent = "Offline";
+                }
+            } catch (err) {
+                badge.className = "status-offline";
+                badge.textContent = "Offline";
+            }
+        }
+
+        setInterval(checkBotStatus, 3000);
+        checkBotStatus();
+
+        // Broadcast Form Handling
+        document.getElementById('annForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = msgInput.value;
+            const btn = document.getElementById('sendBtn');
+            const resDiv = document.getElementById('statusResponse');
+
+            if (!message.trim()) {
+                alert('Please type a message first!');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "⏳ Broadcasting to Members...";
+            resDiv.textContent = "";
+
+            try {
+                const response = await fetch('/send-announcement', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    resDiv.style.color = "#00ff66";
+                    resDiv.textContent = `✅ Successfully sent to ${data.sent} members! (Failed: ${data.failed})`;
+                } else {
+                    resDiv.style.color = "#ff4444";
+                    resDiv.textContent = `❌ Error: ${data.error}`;
+                }
+            } catch (err) {
+                resDiv.style.color = "#ff4444";
+                resDiv.textContent = `❌ Connection error!`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "🚀 Send Announcement to All Members (DM)";
+            }
+        });
+    </script>
+</body>
+</html>
